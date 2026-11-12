@@ -90,3 +90,9 @@ $HOME/wrf_workspace/
 2. Users source `/opt/WRF_GNU/setenv-wrf.sh` in their terminals.
 3. Users create folders in `$HOME/wrf_workspace`, link the executables, copy the `namelist` files, and run their models.
 4. User revises `opt/WRF_GNU/patch-wrf` to symlink necessary files (also as a corrective tool)
+
+### Developer Contact
+
+Whenever errors occur when setting up, compiling, or running executables, please contact me through email:
+`carlbuenaflor09@gmail.com`
+`clbuenaflor@iesm.upd.edu.ph`
