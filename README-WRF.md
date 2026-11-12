@@ -15,13 +15,13 @@ ulimit -s unlimited
 
 ## Step 2: Set Up WPS and WRF Directories via Symlinks
 
-To keep the centralized installation clean and save disk space, all simulations must be run inside your `/scratch` directory using symbolic links.
+To keep the centralized installation clean and save disk space, all simulations will be run inside a dedicated workspace in your home directory using symbolic links.
 
 ### 1. Link WPS Setup
 ```bash
-# Create and enter your personal scratch directory for WPS
-mkdir -p /scratch/$USER/my_test_case/WPS
-cd /scratch/$USER/my_test_case/WPS
+# Create and enter your personal workspace directory for WPS
+mkdir -p $HOME/wrf_workspace/my_test_case/WPS
+cd $HOME/wrf_workspace/my_test_case/WPS
 
 # Link WPS executables and utility scripts
 ln -sf /opt/WRF_GNU/WPS-4.7.0/*.exe .
@@ -39,8 +39,8 @@ cp /opt/WRF_GNU/WPS-4.7.0/namelist.wps .
 ### 2. Link WRF Setup
 ```bash
 # Create the WRF run directory
-mkdir -p /scratch/$USER/my_test_case/WRF_run
-cd /scratch/$USER/my_test_case/WRF_run
+mkdir -p $HOME/wrf_workspace/my_test_case/WRF_run
+cd $HOME/wrf_workspace/my_test_case/WRF_run
 
 # Link ALL files from the central WRF run directory 
 # (This brings in wrf.exe, real.exe, and all necessary .TBL and lookup data files)
@@ -57,7 +57,7 @@ WPS prepares your domain and meteorological data for WRF.
 
 1. **Navigate to your local WPS folder:**
    ```bash
-   cd /scratch/$USER/my_test_case/WPS
+   cd $HOME/wrf_workspace/my_test_case/WPS
    ```
 
 2. **Configure Domain:**
@@ -91,7 +91,7 @@ WRF uses the output from WPS to perform the actual simulation.
 
 1. **Navigate to your WRF run directory:**
    ```bash
-   cd /scratch/$USER/my_test_case/WRF_run
+   cd $HOME/wrf_workspace/my_test_case/WRF_run
    ```
 
 2. **Link Metgrid Files:**
@@ -113,4 +113,4 @@ WRF uses the output from WPS to perform the actual simulation.
    ```bash
    mpirun -np 4 ./wrf.exe
    ```
-   *This process can take a significant amount of time depending on domain size and resolution. Upon successful completion, it will generate `wrfout_d0X_*` files which you can visualize using software like Python, NCL, or GrADS.*
+   *Note: WRF output files (`wrfout_*`) can grow to several gigabytes. Monitor your VM's disk space using the `df -h` command.*
