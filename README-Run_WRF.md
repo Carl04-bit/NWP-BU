@@ -51,6 +51,16 @@ rm namelist.input
 cp /opt/WRF_GNU/WRF-4.8.0/test/em_real/namelist.input .
 ```
 
+### 3. Apply the Robustness Patch
+Execute the centralized system patch tool (`patch_wrf`) on both folders to automatically hardcode WPS table paths and link all required trace gas and aerosol physics files.
+```bash
+# Patches namelist.wps to prevent symlink MPI_ABORT errors
+patch_wrf $HOME/wrf_workspace/my_test_case/WPS
+
+# Exhaustively links CAM*, aerosol*, and RRTMG* files for real.exe
+patch_wrf $HOME/wrf_workspace/my_test_case/WRF_run
+```
+
 ## Step 3: Run WPS (Preprocessing)
 
 WPS prepares your domain and meteorological data for WRF.
@@ -61,7 +71,7 @@ WPS prepares your domain and meteorological data for WRF.
    ```
 
 2. **Configure Domain:**
-   Open `namelist.wps` and configure your domain parameters. Ensure the `geog_data_path` points to `/opt/WRF_GNU/WPS_GEOG`.
+   Open `namelist.wps` and configure your domain parameters. Ensure the `geog_data_path` points to `/opt/WRF_GNU/WPS_GEOG`. *(Note: `opt_geogrid_tbl_path` and `opt_metgrid_tbl_path` have already been injected by `patch_wrf`).*
 
 3. **Run Geogrid:** (Defines the model domains)
    ```bash
@@ -100,8 +110,10 @@ WRF uses the output from WPS to perform the actual simulation.
    ln -sf ../WPS/met_em.d0* .
    ```
 
-3. **Configure Simulation:**
-   Edit `namelist.input` to match the exact start/end dates and domain dimensions specified in your `namelist.wps`.
+3. **Configure Simulation & Dynamic Stability:**
+   Edit `namelist.input` to match the exact start/end dates and domain dimensions specified in your `namelist.wps`. To prevent CFL numerical instability during severe weather:
+   * In `&domains`: Set `time_step` conservatively (e.g., `3 * dx` in km, such as `90` for a 27–30 km grid).
+   * In `&dynamics`: Ensure `w_damping = 1` is set to safely absorb intense vertical updrafts.
 
 4. **Run `real.exe`:** (Generates initial and boundary conditions)
    ```bash
