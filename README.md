@@ -50,6 +50,7 @@ This directory requires `sudo` privileges to modify. It houses the compiled exec
 ├── setenv-wrf.sh        # Master environment script (loads NetCDF, MPI, Compilers)
 ├── compile-wrf.sh       # Automated, idempotent WRF & WPS installation script
 ├── compile-cm1.sh       # Automated CM1 installation script
+├── patch-wrf.sh         # Patching tool
 │
 ├── grib2/               # Manually compiled Jasper libraries
 ├── WPS_GEOG/            # Shared high-resolution static geographic data (~30GB)
@@ -88,3 +89,4 @@ $HOME/wrf_workspace/
 1. Administrators set up `/opt/WRF_GNU` once using the provided compilation scripts.
 2. Users source `/opt/WRF_GNU/setenv-wrf.sh` in their terminals.
 3. Users create folders in `$HOME/wrf_workspace`, link the executables, copy the `namelist` files, and run their models.
+4. User revises `opt/WRF_GNU/patch-wrf` to symlink necessary files (also as a corrective tool)
