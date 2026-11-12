@@ -107,4 +107,10 @@ Once the script finishes, you can verify the installation by checking if the mai
 ls -l /opt/WRF_GNU/cm1r22.0/run/cm1.exe
 ```
 
-If the file is present, your CM1 installation is complete and ready for users to link into their personal workspaces!
+If the file is present, your CM1 installation is complete and ready for users to link into their personal workspaces.
+
+## Extra: Running on Certain specifications
+
+You may need to re-compile if you want to apply `input_sounding` in your CM1 runs. To do so, revise `base.f` and recompile via `make` in terminal
+
+README files are at `opt/WRF_GNU/cm1r22.0/`
