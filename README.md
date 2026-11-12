@@ -3,30 +3,48 @@
 This guide provides step-by-step instructions to compile and install WRF v4.8.0 and WPS v4.7.0 in the `/opt/WRF_GNU` directory on an Ubuntu Linux system.
 
 ## Prerequisites
-Ensure your system has the required compilers and libraries installed via Ubuntu's package manager:
+Ensure your system has the required compilers and libraries installed via Ubuntu's package manager. Note that we do not install `libjasper-dev` here, as it must be compiled manually for compatibility.
+
 ```bash
 sudo apt update
-sudo apt install build-essential csh gfortran m4 mpi-default-dev mpi-default-bin \
-    libnetcdf-dev libnetcdff-dev libhdf5-dev netcdf-bin \
-    libpng-dev libjasper-dev zlib1g-dev
+sudo apt install -y gcc g++ gfortran build-essential csh tcsh m4 \
+                    libopenmpi-dev openmpi-bin \
+                    libnetcdf-dev libnetcdff-dev netcdf-bin \
+                    libpng-dev zlib1g-dev
 ```
 
-## Step 1: Create the Environment Script
-This script configures the paths and compilers needed by both the installer and the users.
+## Step 1: Compile and Install Jasper
+Since newer versions of Ubuntu no longer include a compatible `libjasper-dev` package, you must compile it from source to enable WPS to process GRIB2 files (like GFS data).
 
-1. Open your terminal and create the setup directory:
-   ```bash
-   sudo mkdir -p /opt/WRF_GNU
-   ```
-2. Create the file `/opt/WRF_GNU/setenv-wrf.sh`:
+```bash
+# Create the central installation directory
+sudo mkdir -p /opt/WRF_GNU
+cd /opt/WRF_GNU
+
+# Download and extract Jasper
+sudo wget https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz
+sudo tar -xf jasper-1.900.1.tar.gz
+
+# Configure and compile into a custom grib2 directory
+sudo mkdir -p /opt/WRF_GNU/grib2
+cd /opt/WRF_GNU/jasper-1.900.1/
+sudo ./configure --prefix=/opt/WRF_GNU/grib2
+sudo make
+sudo make install
+```
+
+## Step 2: Create the Environment Script
+This script configures the paths and compilers needed by both the installer and the users. It now points to your newly compiled Jasper library.
+
+1. Create the file `/opt/WRF_GNU/setenv-wrf.sh`:
    ```bash
    sudo nano /opt/WRF_GNU/setenv-wrf.sh
    ```
-3. Paste the following contents:
+2. Paste the following contents:
    ```bash
    #!/usr/bin/env bash
    # WRF 4.8.0 / WPS 4.7.0
-   # Dependencies supplied by Ubuntu
+   # Dependencies supplied by Ubuntu and Manual Compilation
    
    # Installation directories
    export WRF_HOME=/opt/WRF_GNU
@@ -36,9 +54,9 @@ This script configures the paths and compilers needed by both the installer and 
    # System NetCDF libraries (Dynamic lookup)
    export NETCDF="$(nc-config --prefix)"
    
-   # Jasper libraries for WPS GRIB2 support (Standard Ubuntu paths)
-   export JASPERLIB="/usr/lib/x86_64-linux-gnu"
-   export JASPERINC="/usr/include"
+   # Jasper libraries for WPS GRIB2 support (Custom Compilation)
+   export JASPERLIB="/opt/WRF_GNU/grib2/lib"
+   export JASPERINC="/opt/WRF_GNU/grib2/include"
    
    # WRF Specific Environment Variables
    export WRFIO_NCD_LARGE_FILE_SUPPORT=1
@@ -57,7 +75,7 @@ This script configures the paths and compilers needed by both the installer and 
    echo "  NETCDF:  $NETCDF"
    ```
 
-## Step 2: Create the Compilation Script
+## Step 3: Create the Compilation Script
 This script automates downloading, extracting, and compiling WRF, WPS, and the geographical data.
 
 1. Create the file `/opt/WRF_GNU/compile-wrf.sh`:
@@ -130,8 +148,8 @@ This script automates downloading, extracting, and compiling WRF, WPS, and the g
    echo "Installation complete in $WRF_HOME."
    ```
 
-## Step 3: Run the Compilation
-Make the scripts executable and run the installation script. **Note: Compiling WRF takes time.**
+## Step 4: Run the Compilation
+Make the scripts executable and run the installation script. **Note: Compiling WRF takes a significant amount of time depending on your system's hardware.**
 
 ```bash
 sudo chmod +x /opt/WRF_GNU/setenv-wrf.sh
