@@ -10,9 +10,9 @@ export WPS_DIR="${WRF_HOME}/WPS-4.7.0"
 # System NetCDF libraries (Dynamic lookup)
 export NETCDF="$(nc-config --prefix)"
 
-# Jasper libraries for WPS GRIB2 support (Standard Ubuntu paths)
-export JASPERLIB="/usr/lib/x86_64-linux-gnu"
-export JASPERINC="/usr/include"
+# Jasper libraries for WPS GRIB2 support (Custom Compilation)
+export JASPERLIB="/opt/WRF_GNU/grib2/lib"
+export JASPERINC="/opt/WRF_GNU/grib2/include"
 
 # WRF Specific Environment Variables
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
